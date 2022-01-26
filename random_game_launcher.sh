@@ -154,4 +154,5 @@ du -c -- **/*.nes **/*.fds | tail -n 1
 - Create official github before launch
 
 - find filesize of only specific rom extensions
-du -c -- **/*.nes **/*.fds | tail -n 1
+
+cd /media/fat/games/$console; shopt -s extglob; du -sc -- **/*.nes **/*.fds | tail -n 1 | awk '{print $1}'
