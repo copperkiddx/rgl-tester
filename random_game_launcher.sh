@@ -151,3 +151,6 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 - Interactive menu to select any core?
 
 - Create official github before launch
+
+- find filesize of only specific rom extensions
+du -c -- **/*.nes **/*.fds | tail -n 1
