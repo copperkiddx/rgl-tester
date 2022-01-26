@@ -17,6 +17,10 @@ launch_delay="0"
 #=========   FUNCTIONS   =========
 
 checkDependencies () {
+    # if config folder doesn't exist, create it
+    [ ! -d "$config_folder" ] && mkdir "$config_folder"
+    # cd into config folder
+    cd $config_folder
     if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]]
     then
         # Test internet
@@ -80,12 +84,6 @@ loadRandomRom () {
 #=========   BEGIN SCRIPT   =========
 
 printf "Random Game Launcher ($console)\n\n"
-
-# if config folder doesn't exist, create it
-[ ! -d "$config_folder" ] && mkdir "$config_folder"
-
-# cd into config folder
-cd $config_folder
 
 checkDependencies
 
