@@ -119,6 +119,7 @@ exit 0
 TO-DO
 
 - Script that curls actual script
+wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/master/random_game_launcher.sh"
 
 - Check games folder size with du and diff to rescan core
 
