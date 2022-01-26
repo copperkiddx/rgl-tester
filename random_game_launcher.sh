@@ -142,22 +142,9 @@ find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$cons
 - Script that curls actual script
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
 
-- Check games folder size with du and diff to rescan core
-du -s --exclude='*.[Rr][Oo][Mm]' --exclude=/media/fat/games/NES/Palettes /media/fat/games/NES | awk '{print $1}'
-
 - Create README.md
 
 - Faster way to get a list of rom locations? Tree?
-
-- Diff rom counts for rom list update?
-
-# if rom_count.txt exists, cat it to set variable (for use with rescanning ROMS later on)
-# if nes.txt exists
-#   count lines
-#   if lines != $(cat rom_count.txt), then rescan
-# else
-#   # find all rom files and print them to a file
-# [ -f rom_count.txt ] && rom_count="`cat rom_count.txt`"
 
 - Check script at https://www.shellcheck.net/
 
