@@ -19,7 +19,7 @@ launch_delay="2"
 firstRun () {
     printf "** FIRST RUN ($console): Please be patient while all roms are scanned **\n\n"
     # find all rom files and print them to a file
-    find "$core_games_folder" -iregex '.*\.\(nes\|fds\|nsf\)$' -exec ls > "rom_path_$console.txt" {} \;
+    find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
     # if rom_path_$console.txt is empty, no roms were found so exit
     if [[ -z $(grep '[^[:space:]]' rom_path_$console.txt) ]]
     then
@@ -29,7 +29,7 @@ firstRun () {
         # generate line count and export to rom_count_$console.txt
         cat "rom_path_$console.txt" | sed '/^\s*$/d' | wc -l > "rom_count_$console.txt"
         total_roms="`cat rom_count_$console.txt`"
-        printf "Scan complete - $console ROMS found: $total_roms\n\n"
+        printf "Scan complete - ROMS found: $total_roms\n\n"
         # create scanned_$console.txt file to stop from scanning again
         touch "scanned_$console.txt"
     fi
@@ -40,6 +40,7 @@ loadRandomRom () {
     random_number="$(( $RANDOM % $total_roms + 1 ))"
     random_rom_path="`sed -n "$random_number"p rom_path_$console.txt`"
     random_rom_filename="`echo "${random_rom_path##*/}"`"
+    random_rom_extension="`echo "${random_rom_filename##*.}"`"
     if [[ $hide_rom_name_on_launch == "1" ]]
     then
         printf "Now loading...\n\n$random_number / $total_roms: ???\n\n"
@@ -48,7 +49,12 @@ loadRandomRom () {
     fi
     sleep "$launch_delay"
     # load random ROM
-    /media/fat/Scripts/mbc load_rom "$console" "$random_rom_path"
+    if [[ $random_rom_extension == "fds" ]]
+    then
+        /media/fat/Scripts/.mister_batch_control/mbc load_rom "NES.FDS" "$random_rom_path"
+    else
+        /media/fat/Scripts/.mister_batch_control/mbc load_rom "$console" "$random_rom_path"
+    fi
 }
 
 #=========   END FUNCTIONS   =========
@@ -63,15 +69,16 @@ printf "Random Game Launcher ($console)\n\n"
 # cd into config folder
 cd $config_folder
 
-if [[ ! -f "/media/fat/Scripts/mbc" ]]
+if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]]
 then
     # Test internet
     ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && printf "No internet connection, please try again\n\n" && exit 126
     printf "Installing dependencies (MiSTer_Batch_Control by the amazing Pocomane)...\n\n"
-    wget -P /media/fat/Scripts "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
-    if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/mbc)
+    mkdir /media/fat/Scripts/.mister_batch_control
+    wget -P /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
+    if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc)
     then
-        printf "mbc succesfully installed to /media/fat/Scripts\n\n"
+        printf "MiSTer_Batch_Control successfully installed to /media/fat/Scripts/.mister_batch_control/mbc\n\n"
     else
         printf "ERROR: md5sum for MiSTer_Batch_Control binary is bad, exiting\n\n"
         exit 1
@@ -94,11 +101,13 @@ exit 0
 
 TO-DO
 
-Faster way to get a list of rom locations? Tree?
+- .fds files do not load properly
 
----------------------------------------------------------
+- Test .nsf files
 
-Diff rom counts for rom list update?
+- Faster way to get a list of rom locations? Tree?
+
+- Diff rom counts for rom list update?
 
 # if rom_count.txt exists, cat it to set variable (for use with rescanning roms later on)
 # if nes.txt exists
@@ -108,12 +117,6 @@ Diff rom counts for rom list update?
 #   # find all rom files and print them to a file
 # [ -f rom_count.txt ] && rom_count="`cat rom_count.txt`"
 
----------------------------------------------------------
+- Check script at https://www.shellcheck.net/
 
-Check script at https://www.shellcheck.net/
-
----------------------------------------------------------
-
-Interactive menu?
-
----------------------------------------------------------
+- Interactive menu to select any core?
