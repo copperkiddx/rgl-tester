@@ -40,7 +40,7 @@ checkDependencies () {
     then
         # Test internet
         ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && printf "No internet connection, please try again\n\n" && exit 126
-        printf "Installing dependencies (MiSTer_Batch_Control by the amazing Pocomane)...\n\n"
+        printf "Installing dependencies (MiSTer_Batch_Control)...\n\n"
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
         if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc)
@@ -103,8 +103,9 @@ rescanRoms () {
     previous_games_folder_size="`cat $games_folder_size_console.txt`"
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
-        printf "** NEW ROMS FOUND - Please be patient while all ROMS are re-scanned **\n\n"
-        scanRoms    
+        printf "** FILE CHANGE DETECTED - Please be patient while all ROMS are re-scanned **\n\n"
+        scanRoms
+        getFolderSize
 fi
 }
 
