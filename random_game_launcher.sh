@@ -101,9 +101,7 @@ exit 0
 
 TO-DO
 
-- .fds files do not load properly
-
-- Test .nsf files
+- Silent wget?
 
 - Faster way to get a list of rom locations? Tree?
 
