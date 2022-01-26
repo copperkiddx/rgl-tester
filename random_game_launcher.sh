@@ -142,3 +142,4 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 - Interactive menu to select any core?
 
 - Create official github before launch
+- hi
