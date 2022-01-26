@@ -122,8 +122,9 @@ TO-DO
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
 
 - Check games folder size with du and diff to rescan core
+du -s --exclude='*.[Rr][Oo][Mm]' --exclude=/media/fat/games/NES/Palettes /media/fat/games/NES | awk '{print $1}'
 
-- README
+- Create README.md
 
 - Faster way to get a list of rom locations? Tree?
 
