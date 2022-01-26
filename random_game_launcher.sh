@@ -17,13 +17,13 @@ launch_delay="2"
 #=========   FUNCTIONS   =========
 
 firstRun () {
-    printf "** FIRST RUN ($console): Please be patient while all roms are scanned **\n\n"
+    printf "** FIRST RUN ($console): Please be patient while all ROMS are scanned **\n\n"
     # find all rom files and print them to a file
     find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
-    # if rom_path_$console.txt is empty, no roms were found so exit
+    # if rom_path_$console.txt is empty, no ROMS were found so exit
     if [[ -z $(grep '[^[:space:]]' rom_path_$console.txt) ]]
     then
-        printf "ERROR: No $console roms found at $core_games_folder, exiting...\n\n"
+        printf "ERROR: No $console ROMS found at $core_games_folder, exiting...\n\n"
         exit 1
     else
         # generate line count and export to rom_count_$console.txt
@@ -109,7 +109,7 @@ TO-DO
 
 - Diff rom counts for rom list update?
 
-# if rom_count.txt exists, cat it to set variable (for use with rescanning roms later on)
+# if rom_count.txt exists, cat it to set variable (for use with rescanning ROMS later on)
 # if nes.txt exists
 #   count lines
 #   if lines != $(cat rom_count.txt), then rescan
