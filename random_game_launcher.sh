@@ -53,8 +53,7 @@ checkDependencies () {
     fi
 }
 
-firstRun () {
-    printf "** INITIAL SCAN ($console): Please be patient while all ROMS are scanned **\n\n"
+scanRoms () {
     # find all rom files and print them to a file
     find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
     # if rom_path_$console.txt is empty, no ROMS were found so exit
@@ -94,9 +93,19 @@ loadRandomRom () {
     fi
 }
 
-rescanRoms () {
-    games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
+getFolderSize () {
+    games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='*.txt' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
     echo $games_folder_size > "$games_folder_size_console.txt"
+}
+
+rescanRoms () {
+    current_games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='*.txt' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
+    previous_games_folder_size="`cat $games_folder_size_console.txt`"
+    if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
+    then
+        printf "** NEW ROMS FOUND - Please be patient while all ROMS are re-scanned **\n\n"
+        scanRoms    
+fi
 }
 
 #=========   END FUNCTIONS   =========
@@ -109,9 +118,12 @@ checkDependencies
 
 if [[ -f "scanned_$console.txt" ]]
 then
+    rescanRoms
     loadRandomRom
 else
-    firstRun
+    printf "** INITIAL SCAN - Please be patient while all ROMS are scanned **\n\n"
+    scanRoms
+    getFolderSize
     loadRandomRom
 fi
 
@@ -122,6 +134,9 @@ exit 0
 ---------------------------------------------------------
 
 TO-DO
+
+- Make this line not dependent on NES file extensions:
+find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
 
 - Script that curls actual script
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
