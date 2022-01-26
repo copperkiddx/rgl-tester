@@ -94,6 +94,11 @@ loadRandomRom () {
     fi
 }
 
+rescanRoms () {
+    games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
+    echo $games_folder_size > "$games_folder_size_console.txt"
+}
+
 #=========   END FUNCTIONS   =========
 
 #=========   BEGIN SCRIPT   =========
