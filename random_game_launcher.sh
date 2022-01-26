@@ -120,5 +120,3 @@ Interactive menu?
 
 # show which game it's playing ($random_number)
 sed -n 11982p /media/fat/.rgl/nes.txt
-
-hi 
