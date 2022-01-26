@@ -103,7 +103,11 @@ exit 0
 
 TO-DO
 
-- Silent wget?
+- Script that curls actual script
+
+- Check games folder size with du and diff to rescan core
+
+- README
 
 - Faster way to get a list of rom locations? Tree?
 
