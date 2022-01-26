@@ -145,6 +145,8 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 - Create README.md
 
 - Faster way to get a list of rom locations? Tree?
+Maybe du is faster
+du -c -- **/*.nes **/*.fds | tail -n 1
 
 - Check script at https://www.shellcheck.net/
 
