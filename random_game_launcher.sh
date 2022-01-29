@@ -22,8 +22,7 @@
 #=========   USER OPTIONS   =========
 
 fat_or_usb0="fat"
-hide_rom_name_on_launch="0"
-launch_delay="0"
+hide_rom_name_on_launch="1"
 
 #=========   END USER OPTIONS   =========
 
@@ -37,21 +36,20 @@ checkDependencies () {
     if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]]
     then
         # Test internet
-        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "No internet connection, please try again\n\n" && sleep 2 && exit 126
         clear
-        printf "Installing dependencies (MiSTer_Batch_Control)...\n\n"
+        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "No internet connection, please try again\n\n" && exit 126
+        printf "Installing dependencies (MiSTer_Batch_Control)..."
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
+        sleep 1
         if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc)
         then
             clear
-            printf "MiSTer_Batch_Control successfully installed to /media/fat/Scripts/.mister_batch_control/mbc\n\n"
+            printf "MiSTer_Batch_Control successfully installed to /media/fat/Scripts/.mister_batch_control/mbc"
             sleep 2
         else
             clear
-            printf "ERROR: md5sum for MiSTer_Batch_Control binary is bad, exiting\n\n"
-            sleep 2
-            exit 1
+            printf "ERROR: md5sum for MiSTer_Batch_Control binary is bad, exiting"
         fi
     fi
 }
@@ -67,17 +65,12 @@ loadRandomRom () {
     random_rom_path="`sed -n "$random_number"p rom_path_$console.txt`"
     random_rom_filename="`echo "${random_rom_path##*/}"`"
     random_rom_extension="`echo "${random_rom_filename##*.}"`"
-    if [[ $hide_rom_name_on_launch == "1" ]]
-    then
-        clear
-        printf "Now loading...\n\n$random_number / $total_roms: ???\n\n"
-        sleep 2
-    else
-        clear
-        printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename\n\n"
-        sleep 2
-    fi
-    sleep "$launch_delay"
+
+    if [ $hide_rom_name_on_launch -eq 1 ]; then random_rom_filename="???"; fi
+    clear
+    printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename"
+    sleep 2
+
     # load random ROM
     if [[ $random_rom_extension == "fds" ]]
     then
@@ -93,7 +86,8 @@ rescanRoms () {
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
         clear
-        printf "** FILE CHANGE DETECTED - Please be patient while all ROMS are re-scanned **\n\n"
+        printf "** FILE CHANGE DETECTED - Please be patient while all ROMS are re-scanned **"
+        sleep 2
         scanRoms
         getFolderSize
 fi
@@ -121,6 +115,7 @@ scanRoms () {
         total_roms="`cat rom_count_$console.txt`"
         clear
         printf "Scan complete - ROMS found: $total_roms\n\n"
+        sleep 1
         # create scanned_$console.txt file to stop from scanning again
         touch "scanned_$console.txt"
     fi
@@ -164,7 +159,8 @@ while true; do
       ;;
     $DIALOG_ESC)
       clear
-      echo "Program aborted." >&2
+      echo "Program aborted" >&2
+      echo
       exit 1
       ;;
   esac
@@ -195,7 +191,8 @@ then
     loadRandomRom
 else
     clear
-    printf "** INITIAL SCAN - Please be patient while all $console ROMS are scanned **\n\n"
+    printf "** INITIAL SCAN - Please be patient while all $console ROMS are scanned **"
+    sleep 2
     scanRoms
     getFolderSize
     loadRandomRom
