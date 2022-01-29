@@ -59,6 +59,51 @@ getFolderSize () {
     echo $games_folder_size > "$games_folder_size_console.txt"
 }
 
+launchMenu () {
+
+DIALOG_CANCEL=1
+DIALOG_ESC=255
+HEIGHT=0
+WIDTH=0
+
+while true; do
+  exec 3>&1
+  selection=$(dialog \
+    --backtitle "Random Game Launcher" \
+    --clear \
+    --cancel-label "Exit" \
+    --menu "Please select a console:" $HEIGHT $WIDTH 4 \
+    "1" "NES" \
+    "2" "SNES" \
+    2>&1 1>&3)
+  exit_status=$?
+  exec 3>&-
+  case $exit_status in
+    $DIALOG_CANCEL)
+      clear
+      echo "Program terminated."
+      exit
+      ;;
+    $DIALOG_ESC)
+      clear
+      echo "Program aborted" >&2
+      echo
+      exit 1
+      ;;
+  esac
+  case $selection in
+    1 )
+      console="NES"
+      break
+      ;;
+    2 )
+      console="SNES"
+      break
+      ;;
+  esac
+done
+}
+
 loadRandomRom () {
     total_roms="`cat rom_count_$console.txt`"
     random_number="$(( $RANDOM % $total_roms + 1 ))"
@@ -125,57 +170,6 @@ scanRoms () {
 
 #=========   BEGIN MAIN PROGRAM   =========
 
-# Create menu
-
-DIALOG_CANCEL=1
-DIALOG_ESC=255
-HEIGHT=0
-WIDTH=0
-
-display_result() {
-  dialog --title "$1" \
-    --no-collapse \
-    --msgbox "$result" 0 0
-}
-
-while true; do
-  exec 3>&1
-  selection=$(dialog \
-    --backtitle "System Information" \
-    --title "Random Game Launcher" \
-    --clear \
-    --cancel-label "Exit" \
-    --menu "Please select:" $HEIGHT $WIDTH 4 \
-    "1" "NES" \
-    "2" "SNES" \
-    2>&1 1>&3)
-  exit_status=$?
-  exec 3>&-
-  case $exit_status in
-    $DIALOG_CANCEL)
-      clear
-      echo "Program terminated."
-      exit
-      ;;
-    $DIALOG_ESC)
-      clear
-      echo "Program aborted" >&2
-      echo
-      exit 1
-      ;;
-  esac
-  case $selection in
-    1 )
-      console="NES"
-      break
-      ;;
-    2 )
-      console="SNES"
-      break
-      ;;
-  esac
-done
-
 # Set variables
 
 core_games_folder="/media/$fat_or_usb0/games/$console"
@@ -183,6 +177,9 @@ config_folder="/media/fat/Scripts/.rgl"
 
 # Install dependencies
 checkDependencies
+
+# Launch menu
+launchMenu
 
 # Scan roms or load random game
 if [[ -f "scanned_$console.txt" ]]
@@ -213,6 +210,8 @@ Genesis
 NeoGeo
 SMS
 TGFX16
+
+- Add ALL option
 
 - Script that curls actual script
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
