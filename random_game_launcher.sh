@@ -21,9 +21,7 @@
 
 #=========   USER OPTIONS   =========
 
-console="NES" # Supported consoles: ATARI2600|GAMEBOY|GBA|Genesis|NeoGeo|NES|SMS|SNES|TGFX16
-core_games_folder="/media/fat/games/$console"
-config_folder="/media/fat/Scripts/.rgl"
+fat_or_usb0="fat"
 hide_rom_name_on_launch="0"
 launch_delay="0"
 
@@ -39,36 +37,28 @@ checkDependencies () {
     if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]]
     then
         # Test internet
-        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && printf "No internet connection, please try again\n\n" && exit 126
+        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "No internet connection, please try again\n\n" && sleep 2 && exit 126
+        clear
         printf "Installing dependencies (MiSTer_Batch_Control)...\n\n"
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
         if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc)
         then
+            clear
             printf "MiSTer_Batch_Control successfully installed to /media/fat/Scripts/.mister_batch_control/mbc\n\n"
+            sleep 2
         else
+            clear
             printf "ERROR: md5sum for MiSTer_Batch_Control binary is bad, exiting\n\n"
+            sleep 2
             exit 1
         fi
     fi
 }
 
-scanRoms () {
-    # find all rom files and print them to a file
-    find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
-    # if rom_path_$console.txt is empty, no ROMS were found so exit
-    if [[ -z $(grep '[^[:space:]]' rom_path_$console.txt) ]]
-    then
-        printf "ERROR: No $console ROMS found at $core_games_folder, exiting...\n\n"
-        exit 1
-    else
-        # generate line count and export to rom_count_$console.txt
-        cat "rom_path_$console.txt" | sed '/^\s*$/d' | wc -l > "rom_count_$console.txt"
-        total_roms="`cat rom_count_$console.txt`"
-        printf "Scan complete - ROMS found: $total_roms\n\n"
-        # create scanned_$console.txt file to stop from scanning again
-        touch "scanned_$console.txt"
-    fi
+getFolderSize () {
+    games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='*.txt' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
+    echo $games_folder_size > "$games_folder_size_console.txt"
 }
 
 loadRandomRom () {
@@ -79,23 +69,22 @@ loadRandomRom () {
     random_rom_extension="`echo "${random_rom_filename##*.}"`"
     if [[ $hide_rom_name_on_launch == "1" ]]
     then
+        clear
         printf "Now loading...\n\n$random_number / $total_roms: ???\n\n"
+        sleep 2
     else
+        clear
         printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename\n\n"
+        sleep 2
     fi
     sleep "$launch_delay"
     # load random ROM
     if [[ $random_rom_extension == "fds" ]]
     then
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "NES.FDS" "$random_rom_path"
-    else
+    else # do an elif here if another alternate core is needed
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "$console" "$random_rom_path"
     fi
-}
-
-getFolderSize () {
-    games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='*.txt' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
-    echo $games_folder_size > "$games_folder_size_console.txt"
 }
 
 rescanRoms () {
@@ -103,26 +92,110 @@ rescanRoms () {
     previous_games_folder_size="`cat $games_folder_size_console.txt`"
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
+        clear
         printf "** FILE CHANGE DETECTED - Please be patient while all ROMS are re-scanned **\n\n"
         scanRoms
         getFolderSize
 fi
 }
 
+scanRoms () {
+    # find all rom files and print them to a file
+        if [ $console == "NES" ]; then
+            find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
+        elif [ $console == "SNES" ]; then
+            find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' -exec ls > "rom_path_$console.txt" {} \;
+        else
+            copperkiddx="awesome"
+        fi
+
+    # if rom_path_$console.txt is empty, no ROMS were found so exit
+    if [[ -z $(grep '[^[:space:]]' rom_path_$console.txt) ]]
+    then
+        clear
+        printf "ERROR: No $console ROMS found at $core_games_folder, exiting...\n\n"
+        exit 1
+    else
+        # generate line count and export to rom_count_$console.txt
+        cat "rom_path_$console.txt" | sed '/^\s*$/d' | wc -l > "rom_count_$console.txt"
+        total_roms="`cat rom_count_$console.txt`"
+        clear
+        printf "Scan complete - ROMS found: $total_roms\n\n"
+        # create scanned_$console.txt file to stop from scanning again
+        touch "scanned_$console.txt"
+    fi
+}
+
 #=========   END FUNCTIONS   =========
 
-#=========   BEGIN SCRIPT   =========
+#=========   BEGIN MAIN PROGRAM   =========
 
-printf "Random Game Launcher ($console)\n\n"
+# Create menu
 
+DIALOG_CANCEL=1
+DIALOG_ESC=255
+HEIGHT=0
+WIDTH=0
+
+display_result() {
+  dialog --title "$1" \
+    --no-collapse \
+    --msgbox "$result" 0 0
+}
+
+while true; do
+  exec 3>&1
+  selection=$(dialog \
+    --backtitle "System Information" \
+    --title "Random Game Launcher" \
+    --clear \
+    --cancel-label "Exit" \
+    --menu "Please select:" $HEIGHT $WIDTH 4 \
+    "1" "NES" \
+    "2" "SNES" \
+    2>&1 1>&3)
+  exit_status=$?
+  exec 3>&-
+  case $exit_status in
+    $DIALOG_CANCEL)
+      clear
+      echo "Program terminated."
+      exit
+      ;;
+    $DIALOG_ESC)
+      clear
+      echo "Program aborted." >&2
+      exit 1
+      ;;
+  esac
+  case $selection in
+    1 )
+      console="NES"
+      break
+      ;;
+    2 )
+      console="SNES"
+      break
+      ;;
+  esac
+done
+
+# Set variables
+
+core_games_folder="/media/$fat_or_usb0/games/$console"
+config_folder="/media/fat/Scripts/.rgl"
+
+# run checkDependencies function
 checkDependencies
 
+# run main functions
 if [[ -f "scanned_$console.txt" ]]
 then
     rescanRoms
     loadRandomRom
 else
-    printf "** INITIAL SCAN - Please be patient while all ROMS are scanned **\n\n"
+    clear
+    printf "** INITIAL SCAN - Please be patient while all $console ROMS are scanned **\n\n"
     scanRoms
     getFolderSize
     loadRandomRom
@@ -130,14 +203,11 @@ fi
 
 exit 0
 
-#=========   END SCRIPT   =========
+#=========   END MAIN PROGRAM   =========
 
 ---------------------------------------------------------
 
 TO-DO
-
-- Make this line not dependent on NES file extensions:
-find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
 
 - Script that curls actual script
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
@@ -148,8 +218,6 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 du -c -- **/*.nes **/*.fds | tail -n 1
 
 - Check script at https://www.shellcheck.net/
-
-- Interactive menu to select any core?
 
 - Create official github before launch
 
