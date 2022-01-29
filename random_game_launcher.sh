@@ -55,7 +55,8 @@ checkDependencies () {
 }
 
 getFolderSize () {
-    games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='*.txt' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
+    # make this elif
+    games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     echo $games_folder_size > "$games_folder_size_console.txt"
 }
 
@@ -105,6 +106,7 @@ done
 }
 
 loadRandomRom () {
+    # TODO - do I need 'cd /media/fat/games/$console' here?
     total_roms="`cat rom_count_$console.txt`"
     random_number="$(( $RANDOM % $total_roms + 1 ))"
     random_rom_path="`sed -n "$random_number"p rom_path_$console.txt`"
@@ -120,13 +122,13 @@ loadRandomRom () {
     if [[ $random_rom_extension == "fds" ]]
     then
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "NES.FDS" "$random_rom_path"
-    else # do an elif here if another alternate core is needed
+    else # TODO - do an elif here if another alternate core is needed
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "$console" "$random_rom_path"
     fi
 }
 
 rescanRoms () {
-    current_games_folder_size="`du -s --exclude='*.[Rr][Oo][Mm]' --exclude='*.md' --exclude='*.txt' --exclude='.DS_Store' --exclude='._.DS_Store' --exclude=/media/fat/games/$console/Palettes /media/fat/games/$console | awk '{print $1}'`"
+    current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     previous_games_folder_size="`cat $games_folder_size_console.txt`"
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
@@ -219,7 +221,7 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 - Create README.md
 
 - Faster way to get a list of rom locations? Tree? Maybe du is faster
-du -c -- **/*.nes **/*.fds | tail -n 1
+du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'
 
 - Check script at https://www.shellcheck.net/
 
