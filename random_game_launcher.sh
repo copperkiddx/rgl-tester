@@ -107,7 +107,7 @@ scanRoms () {
     if [[ -z $(grep '[^[:space:]]' rom_path_$console.txt) ]]
     then
         clear
-        printf "ERROR: No $console ROMS found at $core_games_folder, exiting...\n\n"
+        printf "ERROR: No $console ROMS found at $core_games_folder, exiting"
         exit 1
     else
         # generate line count and export to rom_count_$console.txt
@@ -181,10 +181,10 @@ done
 core_games_folder="/media/$fat_or_usb0/games/$console"
 config_folder="/media/fat/Scripts/.rgl"
 
-# run checkDependencies function
+# Install dependencies
 checkDependencies
 
-# run main functions
+# Scan roms or load random game
 if [[ -f "scanned_$console.txt" ]]
 then
     rescanRoms
@@ -205,6 +205,14 @@ exit 0
 ---------------------------------------------------------
 
 TO-DO
+
+- Add supported consoles
+GAMEBOY
+GBA
+Genesis
+NeoGeo
+SMS
+TGFX16
 
 - Script that curls actual script
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
