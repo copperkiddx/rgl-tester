@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Random Game Launcher v1.0 (Non-interactive version)
+# Random Game Launcher v1.0
 # by copperkiddx <copperkiddx@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You can download the latest version of this tool from:
-# https://github.com/copperkiddx/random_game_launcher
+# https://github.com/copperkiddx/MiSTer-console-random-game-launcher
 
 #=========   USER OPTIONS   =========
 
