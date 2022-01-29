@@ -86,7 +86,7 @@ rescanRoms () {
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
         clear
-        printf "** FILE CHANGE DETECTED - Please be patient while all ROMS are re-scanned **"
+        printf "** FILE CHANGE DETECTED - Please be patient while $console ROMS are re-scanned **"
         sleep 2
         scanRoms
         getFolderSize
@@ -100,7 +100,7 @@ scanRoms () {
         elif [ $console == "SNES" ]; then
             find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' -exec ls > "rom_path_$console.txt" {} \;
         else
-            copperkiddx="awesome"
+            copperkiddx="copperkiddx"
         fi
 
     # if rom_path_$console.txt is empty, no ROMS were found so exit
