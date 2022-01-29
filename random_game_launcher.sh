@@ -22,7 +22,7 @@
 #=========   USER OPTIONS   =========
 
 fat_or_usb0="fat"
-hide_rom_name_on_launch="1"
+hide_rom_name_on_launch="0"
 
 #=========   END USER OPTIONS   =========
 
