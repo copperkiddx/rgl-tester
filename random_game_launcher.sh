@@ -43,7 +43,7 @@ checkDependencies () {
         if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc) # Check md5sum with exact mbc file
         then
             clear
-            printf "SUCCESS! MiSTer_Batch_Control installed to /media/fat/Scripts/.mister_batch_control/mbc"
+            printf "SUCCESS! Installed to /media/fat/Scripts/.mister_batch_control/mbc"
             sleep 2
         else
             clear
@@ -187,13 +187,12 @@ launchMenu
 # Scan roms or load random game
 if [[ -f "scanned_$console.txt" ]]
 then
-    clear
     rescanRoms
     loadRandomRom
 else
     clear
     printf "** INITIAL SCAN - Please be patient while all $console ROMS are scanned **"
-    sleep 2
+    sleep 1
     scanRoms
     getFolderSize
     loadRandomRom
