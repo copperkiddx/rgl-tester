@@ -22,7 +22,7 @@
 #=========   USER OPTIONS   =========
 
 fat_or_usb0="fat" # Location of your ROMS - microSD (fat) or hard drive (usb0)
-hide_rom_name_on_launch="0" # 0 to show name on launch, 1 to display "???" instead
+hide_rom_name_on_launch="0" # 0 to show game name upon launch OR 1 to display "???" instead of game name
 
 #=========   END USER OPTIONS   =========
 
@@ -43,7 +43,7 @@ checkDependencies () {
         if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc) # Check md5sum with exact mbc file
         then
             clear
-            printf "MiSTer_Batch_Control successfully installed to /media/fat/Scripts/.mister_batch_control/mbc"
+            printf "SUCCESS! MiSTer_Batch_Control installed to /media/fat/Scripts/.mister_batch_control/mbc"
             sleep 2
         else
             clear
@@ -121,7 +121,7 @@ loadRandomRom () {
     printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename"
     sleep 2
     clear
-    
+
     # load random ROM
     if [[ $random_rom_extension == "fds" ]]
     then
@@ -130,7 +130,6 @@ loadRandomRom () {
         # https://raw.githubusercontent.com/pocomane/MiSTer_Batch_Control/master/mbc.c
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "$console" "$random_rom_path"
     fi
-    clear
 }
 
 rescanRoms () {
@@ -180,11 +179,11 @@ scanRoms () {
 core_games_folder="/media/$fat_or_usb0/games/$console"
 config_folder="/media/fat/Scripts/.rgl"
 
-# Launch menu
-launchMenu
-
 # Install dependencies
 checkDependencies
+
+# Launch menu
+launchMenu
 
 # Scan roms or load random game
 if [[ -f "scanned_$console.txt" ]]
@@ -200,6 +199,8 @@ else
     getFolderSize
     loadRandomRom
 fi
+
+clear
 
 exit 0
 
