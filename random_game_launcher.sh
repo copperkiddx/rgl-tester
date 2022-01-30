@@ -120,7 +120,8 @@ loadRandomRom () {
     clear
     printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename"
     sleep 2
-
+    clear
+    
     # load random ROM
     if [[ $random_rom_extension == "fds" ]]
     then
@@ -129,6 +130,7 @@ loadRandomRom () {
         # https://raw.githubusercontent.com/pocomane/MiSTer_Batch_Control/master/mbc.c
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "$console" "$random_rom_path"
     fi
+    clear
 }
 
 rescanRoms () {
@@ -187,6 +189,7 @@ checkDependencies
 # Scan roms or load random game
 if [[ -f "scanned_$console.txt" ]]
 then
+    clear
     rescanRoms
     loadRandomRom
 else
