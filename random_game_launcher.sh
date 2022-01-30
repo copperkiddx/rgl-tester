@@ -53,7 +53,7 @@ checkDependencies () {
     fi
 }
 
-getFolderSize () { # Find total disk space used by console-specific ROMS only (used for rescanning purposes)
+getFolderSize () { # Find total disk space used by console-specific ROMS only (used for re-scanning purposes)
     if [ $console == "NES" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "SNES" ]; then
@@ -205,7 +205,7 @@ else
     loadRandomRom
 fi
 
-exit 0
+exit
 
 #=========   END MAIN PROGRAM   =========
 
