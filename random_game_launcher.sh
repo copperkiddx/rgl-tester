@@ -33,6 +33,7 @@ checkDependencies () {
     [ ! -d "$config_folder" ] && mkdir "$config_folder"
     # cd into config folder
     cd $config_folder
+    # if mbc does not exist, download it
     if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]]
     then
         # Test internet
@@ -55,58 +56,62 @@ checkDependencies () {
 }
 
 getFolderSize () {
-    # make this elif
-    games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    if [ $console == "NES" ]; then
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    elif [ $console == "SNES" ]; then
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    else
+        copperkiddx="copperkiddx"
+    fi
+
     echo $games_folder_size > "$games_folder_size_console.txt"
 }
 
 launchMenu () {
+    DIALOG_CANCEL=1
+    DIALOG_ESC=255
+    HEIGHT=0
+    WIDTH=0
 
-DIALOG_CANCEL=1
-DIALOG_ESC=255
-HEIGHT=0
-WIDTH=0
-
-while true; do
-  exec 3>&1
-  selection=$(dialog \
-    --backtitle "Random Game Launcher" \
-    --clear \
-    --cancel-label "Exit" \
-    --menu "Please select a console:" $HEIGHT $WIDTH 4 \
-    "1" "NES" \
-    "2" "SNES" \
-    2>&1 1>&3)
-  exit_status=$?
-  exec 3>&-
-  case $exit_status in
-    $DIALOG_CANCEL)
-      clear
-      echo "Program terminated."
-      exit
-      ;;
-    $DIALOG_ESC)
-      clear
-      echo "Program aborted" >&2
-      echo
-      exit 1
-      ;;
-  esac
-  case $selection in
-    1 )
-      console="NES"
-      break
-      ;;
-    2 )
-      console="SNES"
-      break
-      ;;
-  esac
-done
-}
+    while true; do
+    exec 3>&1
+    selection=$(dialog \
+        --backtitle "Random Game Launcher" \
+        --clear \
+        --cancel-label "Exit" \
+        --menu "Please select a console:" $HEIGHT $WIDTH 4 \
+        "1" "NES" \
+        "2" "SNES" \
+        2>&1 1>&3)
+    exit_status=$?
+    exec 3>&-
+    case $exit_status in
+        $DIALOG_CANCEL)
+        clear
+        echo "Program terminated."
+        exit
+        ;;
+        $DIALOG_ESC)
+        clear
+        echo "Program aborted" >&2
+        echo
+        exit 1
+        ;;
+    esac
+    case $selection in
+        1 )
+        console="NES"
+        break
+        ;;
+        2 )
+        console="SNES"
+        break
+        ;;
+    esac
+    done
+    }
 
 loadRandomRom () {
-    # TODO - do I need 'cd /media/fat/games/$console' here?
     total_roms="`cat rom_count_$console.txt`"
     random_number="$(( $RANDOM % $total_roms + 1 ))"
     random_rom_path="`sed -n "$random_number"p rom_path_$console.txt`"
@@ -137,7 +142,7 @@ rescanRoms () {
         sleep 2
         scanRoms
         getFolderSize
-fi
+    fi
 }
 
 scanRoms () {
@@ -173,15 +178,14 @@ scanRoms () {
 #=========   BEGIN MAIN PROGRAM   =========
 
 # Set variables
-
 core_games_folder="/media/$fat_or_usb0/games/$console"
 config_folder="/media/fat/Scripts/.rgl"
 
-# Install dependencies
-checkDependencies
-
 # Launch menu
 launchMenu
+
+# Install dependencies
+checkDependencies
 
 # Scan roms or load random game
 if [[ -f "scanned_$console.txt" ]]
@@ -220,13 +224,6 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 
 - Create README.md
 
-- Faster way to get a list of rom locations? Tree? Maybe du is faster
-du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'
-
 - Check script at https://www.shellcheck.net/
 
 - Create official github before launch
-
-- find filesize of only specific rom extensions
-
-cd /media/fat/games/$console; shopt -s extglob; du -sc -- **/*.nes **/*.fds | tail -n 1 | awk '{print $1}'
