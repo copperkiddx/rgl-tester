@@ -119,7 +119,7 @@ loadRandomRom () {
 
     if [ $hide_rom_name_on_launch -eq 1 ]; then random_rom_filename="???"; fi
     clear
-    printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename"
+    printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename\n\n"
     sleep 2
 
     # load random ROM
@@ -204,6 +204,8 @@ else
     getFolderSize
     loadRandomRom
 fi
+
+clear
 
 exit
 
