@@ -36,7 +36,7 @@ checkDependencies () {
     then
         clear
         ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "ERROR: Missing dependencies (Internet connection required). Please try again\n\n" && exit 126 # Test internet
-        printf "Installing dependencies (MiSTer_Batch_Control)..."
+        printf "Missing dependencies (MiSTer_Batch_Control): Installing from Github..."
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
         sleep 1
@@ -191,14 +191,14 @@ checkDependencies
 # Launch menu
 launchMenu
 
-# Scan roms or load random game
+# If the console has already been scanned, check for new roms, then load game, Otherwise, run an initial scan and then load a random game
 if [[ -f "scanned_$console.txt" ]]
 then
     rescanRoms
     loadRandomRom
 else
     clear
-    printf "** INITIAL SCAN - Please be patient while all $console ROMS are scanned **"
+    printf "** INITIAL SCAN - Please be patient while $console ROMS are scanned **"
     sleep 1
     scanRoms
     getFolderSize
