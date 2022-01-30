@@ -22,7 +22,7 @@
 #=========   USER OPTIONS   =========
 
 fat_or_usb0="fat" # Location of your ROMS - microSD (fat) or hard drive (usb0)
-hide_rom_name_on_launch="1" # 1 to show game name on launch, 0 to display ??? instead
+hide_rom_name_on_launch="0" # 0 to show name on launch, 1 to display "???" instead
 
 #=========   END USER OPTIONS   =========
 
@@ -88,7 +88,8 @@ launchMenu () {
     case $exit_status in
         $DIALOG_CANCEL)
         clear
-        echo "Program terminated."
+        echo "Program terminated"
+        echo
         exit
         ;;
         $DIALOG_ESC)
@@ -127,7 +128,8 @@ loadRandomRom () {
     if [[ $random_rom_extension == "fds" ]]
     then
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "NES.FDS" "$random_rom_path"
-    else # TODO - do an elif here if another alternate core is needed
+    else # TODO - do an elif here if another alternate core is needed besides FDS
+        # https://raw.githubusercontent.com/pocomane/MiSTer_Batch_Control/master/mbc.c
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "$console" "$random_rom_path"
     fi
 }
