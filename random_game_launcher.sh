@@ -21,8 +21,8 @@
 
 #=========   USER OPTIONS   =========
 
-fat_or_usb0="fat"
-hide_rom_name_on_launch="0"
+fat_or_usb0="fat" # Location of your ROMS - microSD (fat) or hard drive (usb0)
+hide_rom_name_on_launch="1" # 1 to show game name on launch, 0 to display ??? instead
 
 #=========   END USER OPTIONS   =========
 
