@@ -120,7 +120,6 @@ loadRandomRom () {
     clear
     printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename"
     sleep 2
-    clear
 
     # load random ROM
     if [[ $random_rom_extension == "fds" ]]
@@ -199,8 +198,6 @@ else
     getFolderSize
     loadRandomRom
 fi
-
-clear
 
 exit 0
 
