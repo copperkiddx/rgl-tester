@@ -36,7 +36,7 @@ checkDependencies () {
     then
         clear
         ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "ERROR: Missing dependencies (Internet connection required). Please try again\n\n" && exit 126 # Test internet
-        printf "Missing dependencies (mbc) - Installing from Github..."
+        printf "Installing missing dependencies from Github (mbc)..."
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
         sleep 1
@@ -113,7 +113,7 @@ launchMenu () {
 loadRandomRom () {
     total_roms="`cat rom_count_$console.txt`"
     random_number="$(( $RANDOM % $total_roms + 1 ))"
-    random_rom_path="`sed -n "$random_number"p rom_path_$console.txt`"
+    random_rom_path="`sed -n "$random_number"p rom_paths_$console.txt`"
     random_rom_filename="`echo "${random_rom_path##*/}"`"
     random_rom_extension="`echo "${random_rom_filename##*.}"`"
 
@@ -154,26 +154,26 @@ rescanRoms () {
 scanRoms () {
     # find all rom files and print them to a file
         if [ $console == "NES" ]; then
-            find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
+            find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "SNES" ]; then
-            find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' -exec ls > "rom_path_$console.txt" {} \;
+            find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' -exec ls > "rom_paths_$console.txt" {} \;
         fi
 
-    # if rom_path_$console.txt is empty, no ROMS were found, so exit
-    if [[ -z $(grep '[^[:space:]]' rom_path_$console.txt) ]]
+    # if rom_paths_$console.txt is empty, no ROMS were found, so exit
+    if [[ -z $(grep '[^[:space:]]' rom_paths_$console.txt) ]]
     then
         clear
         printf "ERROR: No $console ROMS found at $core_games_folder, exiting\n\n"
         exit 126
     else
         # generate line count and export to rom_count_$console.txt
-        cat "rom_path_$console.txt" | sed '/^\s*$/d' | wc -l > "rom_count_$console.txt"
+        cat "rom_paths_$console.txt" | sed '/^\s*$/d' | wc -l > "rom_count_$console.txt"
         total_roms="`cat rom_count_$console.txt`"
         clear
         printf "Scan complete - ROMS found: $total_roms\n\n"
         sleep 1
-        # create scanned_$console.txt file to stop from scanning again
-        touch "scanned_$console.txt"
+        # create scanned_$console file to stop from scanning again
+        touch "scanned_$console"
     fi
 }
 
@@ -192,7 +192,7 @@ checkDependencies
 launchMenu
 
 # If the console has already been scanned, check for new roms, then load game, Otherwise, run an initial scan and then load a random game
-if [[ -f "scanned_$console.txt" ]]
+if [[ -f "scanned_$console" ]]
 then
     rescanRoms
     loadRandomRom
