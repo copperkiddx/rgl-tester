@@ -47,7 +47,8 @@ checkDependencies () {
             sleep 2
         else
             clear
-            printf "ERROR: md5sum for MiSTer_Batch_Control binary is bad, exiting"
+            printf "ERROR: md5sum for MiSTer_Batch_Control binary is bad, exiting\n\n"
+            exit 126
         fi
     fi
 }
@@ -158,12 +159,12 @@ scanRoms () {
             find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' -exec ls > "rom_path_$console.txt" {} \;
         fi
 
-    # if rom_path_$console.txt is empty, no ROMS were found so exit
+    # if rom_path_$console.txt is empty, no ROMS were found, so exit
     if [[ -z $(grep '[^[:space:]]' rom_path_$console.txt) ]]
     then
         clear
-        printf "ERROR: No $console ROMS found at $core_games_folder, exiting"
-        exit 1
+        printf "ERROR: No $console ROMS found at $core_games_folder, exiting\n\n"
+        exit 126
     else
         # generate line count and export to rom_count_$console.txt
         cat "rom_path_$console.txt" | sed '/^\s*$/d' | wc -l > "rom_count_$console.txt"
