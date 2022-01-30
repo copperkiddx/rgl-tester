@@ -35,7 +35,7 @@ checkDependencies () {
     if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]] # If mbc does not exist, download it
     then
         clear
-        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "No internet connection, please try again\n\n" && exit 126 # Test internet
+        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "ERROR: Missing dependencies (Internet connection required). Please try again\n\n" && exit 126 # Test internet
         printf "Installing dependencies (MiSTer_Batch_Control)..."
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
@@ -43,7 +43,7 @@ checkDependencies () {
         if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc) # Check md5sum with exact mbc file
         then
             clear
-            printf "SUCCESS! Installed to /media/fat/Scripts/.mister_batch_control/mbc"
+            printf "SUCCESS! Installed to \"/media/fat/Scripts/.mister_batch_control\""
             sleep 2
         else
             clear
@@ -52,14 +52,14 @@ checkDependencies () {
     fi
 }
 
-getFolderSize () { # Find total disk space used by console-specific ROMS only
+getFolderSize () { # Find total disk space used by console-specific ROMS only (used for rescanning purposes)
     if [ $console == "NES" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "SNES" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     fi
 
-    echo $games_folder_size > "$games_folder_size_console.txt"
+    echo $games_folder_size > "games_folder_size_$console.txt"
 }
 
 launchMenu () {
@@ -132,8 +132,14 @@ loadRandomRom () {
 }
 
 rescanRoms () {
-    current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
-    previous_games_folder_size="`cat $games_folder_size_console.txt`"
+    if [ $console == "NES" ]; then
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    elif [ $console == "SNES" ]; then
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    fi
+
+    previous_games_folder_size="`cat games_folder_size_$console.txt`"
+
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
         clear
