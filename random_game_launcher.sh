@@ -29,21 +29,18 @@ hide_rom_name_on_launch="0" # 0 to show name on launch, 1 to display "???" inste
 #=========   FUNCTIONS   =========
 
 checkDependencies () {
-    # if config folder doesn't exist, create it
-    [ ! -d "$config_folder" ] && mkdir "$config_folder"
-    # cd into config folder
+    [ ! -d "$config_folder" ] && mkdir "$config_folder" # If config folder doesn't exist, create it
     cd $config_folder
-    # if mbc does not exist, download it
-    if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]]
+    
+    if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]] # If mbc does not exist, download it
     then
-        # Test internet
         clear
-        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "No internet connection, please try again\n\n" && exit 126
+        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "No internet connection, please try again\n\n" && exit 126 # Test internet
         printf "Installing dependencies (MiSTer_Batch_Control)..."
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
         sleep 1
-        if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc)
+        if md5sum --status -c <(echo ea32cf0d76812a9994b27365437393f2 /media/fat/Scripts/.mister_batch_control/mbc) # Check md5sum with exact mbc file
         then
             clear
             printf "MiSTer_Batch_Control successfully installed to /media/fat/Scripts/.mister_batch_control/mbc"
@@ -55,13 +52,11 @@ checkDependencies () {
     fi
 }
 
-getFolderSize () {
+getFolderSize () { # Find total disk space used by console-specific ROMS only
     if [ $console == "NES" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "SNES" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
-    else
-        copperkiddx="copperkiddx"
     fi
 
     echo $games_folder_size > "$games_folder_size_console.txt"
@@ -79,7 +74,7 @@ launchMenu () {
             --backtitle "Random Game Launcher" \
             --clear \
             --cancel-label "Exit" \
-            --menu "Please select a console:" $HEIGHT $WIDTH 4 \
+            --menu "Select a console:" $HEIGHT $WIDTH 4 \
             "1" "NES" \
             "2" "SNES" \
              2>&1 1>&3)
@@ -155,8 +150,6 @@ scanRoms () {
             find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_path_$console.txt" {} \;
         elif [ $console == "SNES" ]; then
             find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' -exec ls > "rom_path_$console.txt" {} \;
-        else
-            copperkiddx="copperkiddx"
         fi
 
     # if rom_path_$console.txt is empty, no ROMS were found so exit
