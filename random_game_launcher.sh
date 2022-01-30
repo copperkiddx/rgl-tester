@@ -74,43 +74,45 @@ launchMenu () {
     WIDTH=0
 
     while true; do
-    exec 3>&1
-    selection=$(dialog \
-        --backtitle "Random Game Launcher" \
-        --clear \
-        --cancel-label "Exit" \
-        --menu "Please select a console:" $HEIGHT $WIDTH 4 \
-        "1" "NES" \
-        "2" "SNES" \
-        2>&1 1>&3)
-    exit_status=$?
-    exec 3>&-
-    case $exit_status in
-        $DIALOG_CANCEL)
-        clear
-        echo "Program terminated"
-        echo
-        exit
-        ;;
-        $DIALOG_ESC)
-        clear
-        echo "Program aborted" >&2
-        echo
-        exit 1
-        ;;
-    esac
-    case $selection in
-        1 )
-        console="NES"
-        break
-        ;;
-        2 )
-        console="SNES"
-        break
-        ;;
-    esac
+        exec 3>&1
+        selection=$(dialog \
+            --backtitle "Random Game Launcher" \
+            --clear \
+            --cancel-label "Exit" \
+            --menu "Please select a console:" $HEIGHT $WIDTH 4 \
+            "1" "NES" \
+            "2" "SNES" \
+             2>&1 1>&3)
+        exit_status=$?
+        exec 3>&-
+
+        case $exit_status in
+            $DIALOG_CANCEL)
+                clear
+                echo "Program terminated"
+                echo
+                exit
+                ;;
+            $DIALOG_ESC)
+                clear
+                echo "Program aborted" >&2
+                echo
+                exit 1
+                ;;
+        esac
+
+        case $selection in
+            1 )
+                console="NES"
+                break
+                ;;
+            2 )
+                console="SNES"
+                break
+                ;;
+        esac
     done
-    }
+}
 
 loadRandomRom () {
     total_roms="`cat rom_count_$console.txt`"
