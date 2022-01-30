@@ -36,7 +36,7 @@ checkDependencies () {
     then
         clear
         ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "ERROR: Missing dependencies (Internet connection required). Please try again\n\n" && exit 126 # Test internet
-        printf "Missing dependencies (MiSTer_Batch_Control): Installing from Github..."
+        printf "Missing dependencies (mbc) - Installing from Github..."
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
         sleep 1
