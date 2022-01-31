@@ -29,6 +29,7 @@ hide_rom_name_on_launch="0" # 0 to show game name upon launch OR 1 to display "?
 #=========   FUNCTIONS   =========
 
 checkDependencies () {
+    config_folder="/media/fat/Scripts/.rgl"
     [ ! -d "$config_folder" ] && mkdir "$config_folder" # If config folder doesn't exist, create it
     cd $config_folder
     
@@ -58,6 +59,8 @@ getFolderSize () { # Find total disk space used by console-specific ROMS only (u
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "SNES" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    elif [ $console == "Genesis" ]; then
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.bin *.gen *.md **/*.bin **/*.gen **/*.md 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
     fi
 
     echo $games_folder_size > "games_folder_size_$console.txt"
@@ -78,6 +81,7 @@ launchMenu () {
             --menu "Select a console:" $HEIGHT $WIDTH 4 \
             "1" "NES" \
             "2" "SNES" \
+            "3" "Genesis" \
              2>&1 1>&3)
         exit_status=$?
         exec 3>&-
@@ -106,6 +110,10 @@ launchMenu () {
                 console="SNES"
                 break
                 ;;
+            3 )
+                console="Genesis"
+                break
+                ;;    
         esac
     done
 }
@@ -122,12 +130,14 @@ loadRandomRom () {
     printf "Now loading...\n\n$random_number / $total_roms: $random_rom_filename\n\n"
     sleep 2
 
-    # load random ROM
-    if [[ $random_rom_extension == "fds" ]]
-    then
+    # load random ROM # https://raw.githubusercontent.com/pocomane/MiSTer_Batch_Control/master/mbc.c
+    if [[ $random_rom_extension == "fds" ]]; then
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "NES.FDS" "$random_rom_path"
-    else # TODO - do an elif here if another alternate core is needed besides FDS
-        # https://raw.githubusercontent.com/pocomane/MiSTer_Batch_Control/master/mbc.c
+    elif [[ $random_rom_extension == "md" ]]; then
+        /media/fat/Scripts/.mister_batch_control/mbc load_rom "MEGADRIVE" "$random_rom_path"
+    elif [[ $random_rom_extension == "bin" ]]; then
+        /media/fat/Scripts/.mister_batch_control/mbc load_rom "MEGADRIVE.BIN" "$random_rom_path"
+    else
         /media/fat/Scripts/.mister_batch_control/mbc load_rom "$console" "$random_rom_path"
     fi
 }
@@ -137,6 +147,8 @@ rescanRoms () {
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.nes *.fds **/*.nes **/*.fds 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "SNES" ]; then
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    elif [ $console == "Genesis" ]; then
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.bin *.gen *.md **/*.bin **/*.gen **/*.md 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     fi
 
     previous_games_folder_size="`cat games_folder_size_$console.txt`"
@@ -154,9 +166,11 @@ rescanRoms () {
 scanRoms () {
     # find all rom files and print them to a file
         if [ $console == "NES" ]; then
-            find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' -exec ls > "rom_paths_$console.txt" {} \;
+            find "$core_games_folder" -iregex '.*\.\(nes\|fds\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "SNES" ]; then
-            find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' -exec ls > "rom_paths_$console.txt" {} \;
+            find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
+        elif [ $console == "Genesis" ]; then
+            find "$core_games_folder" -iregex '.*\.\(bin\|gen\|md\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;            
         fi
 
     # if rom_paths_$console.txt is empty, no ROMS were found, so exit
@@ -181,15 +195,14 @@ scanRoms () {
 
 #=========   BEGIN MAIN PROGRAM   =========
 
-# Set variables
-core_games_folder="/media/$fat_or_usb0/games/$console"
-config_folder="/media/fat/Scripts/.rgl"
-
 # Install dependencies
 checkDependencies
 
 # Launch menu
 launchMenu
+
+# Set console game folder path variable
+core_games_folder="/media/$fat_or_usb0/games/$console"
 
 # If the console has already been scanned, check for new roms, then load game, Otherwise, run an initial scan and then load a random game
 if [[ -f "scanned_$console" ]]
@@ -218,7 +231,6 @@ TO-DO
 - Add supported consoles
 GAMEBOY
 GBA
-Genesis
 NeoGeo
 SMS
 TGFX16
