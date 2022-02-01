@@ -67,6 +67,8 @@ getFolderSize () { # Find total disk space used by console-specific ROMS only (u
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gb *.gbc **/*.gb **/*.gbc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
     elif [ $console == "SMS" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
+    elif [ $console == "TGFX16" ]; then
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
     fi
 
     echo $games_folder_size > "games_folder_size_$console.txt"
@@ -91,6 +93,7 @@ launchMenu () {
             "4" "GBA" \
             "5" "GAMEBOY" \
             "6" "SMS" \
+            "7" "TGFX16" \
              2>&1 1>&3)
         exit_status=$?
         exec 3>&-
@@ -133,6 +136,10 @@ launchMenu () {
                 ;;
             6 )
                 console="SMS"
+                break
+                ;;
+            7 )
+                console="TGFX16"
                 break
                 ;;
         esac
@@ -179,7 +186,9 @@ rescanRoms () {
     elif [ $console == "GAMEBOY" ]; then
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gb **/*.gbc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"        
     elif [ $console == "SMS" ]; then
-        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"        
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    elif [ $console == "SMS" ]; then
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"        
     fi
 
     previous_games_folder_size="`cat games_folder_size_$console.txt`"
@@ -201,13 +210,15 @@ scanRoms () {
         elif [ $console == "SNES" ]; then
             find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "Genesis" ]; then
-            find "$core_games_folder" -iregex '.*\.\(bin\|gen\|md\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;            
+            find "$core_games_folder" -iregex '.*\.\(bin\|gen\|md\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "GBA" ]; then
-            find "$core_games_folder" -iregex '.*\.\(gba\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;            
+            find "$core_games_folder" -iregex '.*\.\(gba\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "GAMEBOY" ]; then
-            find "$core_games_folder" -iregex '.*\.\(gb\|gbc\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;            
+            find "$core_games_folder" -iregex '.*\.\(gb\|gbc\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "SMS" ]; then
-            find "$core_games_folder" -iregex '.*\.\(sms\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;            
+            find "$core_games_folder" -iregex '.*\.\(sms\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
+        elif [ $console == "TGFX16" ]; then
+            find "$core_games_folder" -iregex '.*\.\(pce\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         fi
 
     # if rom_paths_$console.txt is empty, no ROMS were found, so exit
@@ -267,7 +278,6 @@ TO-DO
 
 - Add supported consoles
 NeoGeo
-SMS
 TGFX16
 
 - Add ALL option
