@@ -287,6 +287,10 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 
 - Create official github before launch
 
+- Fix link in line 20
+
+- Rename script?
+
 README
 
 - You must be connected to the internet the first time you run this script to download a dependency
