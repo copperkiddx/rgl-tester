@@ -61,6 +61,8 @@ getFolderSize () { # Find total disk space used by console-specific ROMS only (u
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "Genesis" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.bin *.gen *.md **/*.bin **/*.gen **/*.md 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
+    elif [ $console == "GBA" ]; then
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gba **/*.gba 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
     fi
 
     echo $games_folder_size > "games_folder_size_$console.txt"
@@ -82,6 +84,7 @@ launchMenu () {
             "1" "NES" \
             "2" "SNES" \
             "3" "Genesis" \
+            "4" "GBA" \
              2>&1 1>&3)
         exit_status=$?
         exec 3>&-
@@ -113,7 +116,11 @@ launchMenu () {
             3 )
                 console="Genesis"
                 break
-                ;;    
+                ;;
+            4 )
+                console="GBA"
+                break
+                ;;
         esac
     done
 }
@@ -149,6 +156,8 @@ rescanRoms () {
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sfc *.smc **/*.sfc **/*.smc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "Genesis" ]; then
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.bin *.gen *.md **/*.bin **/*.gen **/*.md 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+   elif [ $console == "GBA" ]; then
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gba **/*.gba 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"        
     fi
 
     previous_games_folder_size="`cat games_folder_size_$console.txt`"
@@ -171,6 +180,8 @@ scanRoms () {
             find "$core_games_folder" -iregex '.*\.\(sfc\|smc\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "Genesis" ]; then
             find "$core_games_folder" -iregex '.*\.\(bin\|gen\|md\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;            
+        elif [ $console == "GBA" ]; then
+            find "$core_games_folder" -iregex '.*\.\(gba\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;            
         fi
 
     # if rom_paths_$console.txt is empty, no ROMS were found, so exit
@@ -230,7 +241,6 @@ TO-DO
 
 - Add supported consoles
 GAMEBOY
-GBA
 NeoGeo
 SMS
 TGFX16
