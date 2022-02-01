@@ -276,31 +276,25 @@ exit 0
 
 TO-DO
 
-- Script that curls actual script
-wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
-
 - Rename script?
 
-Craete README.md:
+Create README.md (like this one:  https://github.com/RetroDriven/MiSTerWallpapers)
 
-- You must be connected to the internet the first time you run this script to download a dependency
-- If you wish to run it offline after that, download the script from here and place it in your /media/fat/Scripts folder. But please note, you will not get the latest script updates this way.
-- Be sure to set fat or usb0 in the user options before you use the script! The default is microsd (fat) but some people use usb0
+    - This script will check for the latest version each time it is run
+    - You must be connected to the internet the first time you run this script to download a dependency
+    - If you wish to run it offline after that, download the script from [here] and place it in your /media/fat/Scripts folder. But please note, you will not get the latest script updates this way.
+    - Be sure to set fat or usb0 in the user options before you use the script! The default is microsd (fat) but some people use usb0
+
+- Fix link in line 20 in script and also link in rgl_latest.sh
+
+- Get beta testers to test it out
+
+- Create official repo before launch
+
+Nice but not necessary:
 
 - Check script at https://www.shellcheck.net/
-
-- Fix link in line 20
-
-- Create official github before launch
 
 Later
 
 - Add "ALL" option
-
-1983 NES
-1986 SMS
-1987 TGFX16
-1988 Genesis
-1989 GAMEBOY
-1990 SNES
-2001 GBA
