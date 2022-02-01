@@ -234,7 +234,7 @@ scanRoms () {
         clear
         printf "Scan complete - ROMS found: $total_roms\n\n"
         sleep 1
-        # create scanned_$console file to stop from scanning again
+        # create scanned_$console file to stop from scanning again (unless files are added/deleted)
         touch "scanned_$console"
     fi
 }
@@ -268,7 +268,7 @@ fi
 
 clear
 
-exit
+exit 0
 
 #=========   END MAIN PROGRAM   =========
 
@@ -276,26 +276,26 @@ exit
 
 TO-DO
 
-- Add "ALL" option
-
 - Script that curls actual script
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
 
-- Create README.md
-
-- Check script at https://www.shellcheck.net/
-
-- Create official github before launch
-
-- Fix link in line 20
-
 - Rename script?
 
-README
+Craete README.md:
 
 - You must be connected to the internet the first time you run this script to download a dependency
 - If you wish to run it offline after that, download the script from here and place it in your /media/fat/Scripts folder. But please note, you will not get the latest script updates this way.
 - Be sure to set fat or usb0 in the user options before you use the script! The default is microsd (fat) but some people use usb0
+
+- Check script at https://www.shellcheck.net/
+
+- Fix link in line 20
+
+- Create official github before launch
+
+Later
+
+- Add "ALL" option
 
 1983 NES
 1986 SMS
