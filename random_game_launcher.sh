@@ -21,8 +21,8 @@
 
 #=========   USER OPTIONS   =========
 
-fat_or_usb0="fat" # Location of your ROMS: "fat" for microSD or "usb0" for hard drive
-hide_rom_name_on_launch="0" # 0 to show game name upon launch OR 1 to display "???" instead of game name
+fat_or_usb0="fat" # Location of your ROMS: Use "fat" for microSD or "usb0" for hard drive
+hide_rom_name_on_launch="0" # Use "0" to display the game name upon launch OR "1" to display "???" instead of the game name
 
 #=========   END USER OPTIONS   =========
 
@@ -92,8 +92,8 @@ launchMenu () {
             "3" "Genesis" \
             "4" "GBA" \
             "5" "GAMEBOY" \
-            "6" "SMS" \
-            "7" "TGFX16" \
+            "6" "Master System" \
+            "7" "TurboGrafx-16" \
              2>&1 1>&3)
         exit_status=$?
         exec 3>&-
@@ -278,9 +278,8 @@ TO-DO
 
 - Add supported consoles
 NeoGeo
-TGFX16
 
-- Add ALL option
+- Add "ALL" option
 
 - Script that curls actual script
 wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_game_launcher.sh"
@@ -294,5 +293,5 @@ wget -L "https://raw.githubusercontent.com/copperkiddx/rgl-tester/main/random_ga
 README
 
 - You must be connected to the internet the first time you run this script to download a dependency
-- If you wish to run it offline after that, download the script from here and place it in your /media/fat/Scripts folder
-- Be sure to set fat or usb0 first!
+- If you wish to run it offline after that, download the script from here and place it in your /media/fat/Scripts folder. But please note, you will not get the latest script updates this way.
+- Be sure to set fat or usb0 in the user options before you use the script! The default is microsd (fat) but some people use usb0
