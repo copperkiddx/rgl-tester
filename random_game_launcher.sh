@@ -36,7 +36,7 @@ checkDependencies () {
     if [[ ! -f "/media/fat/Scripts/.mister_batch_control/mbc" ]] # If mbc does not exist, download it
     then
         clear
-        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "ERROR: Missing dependencies (Internet connection required). Please try again\n\n" && exit 126 # Test internet
+        ping -c 1 8.8.8.8 &>/dev/null; [ "$?" != "0" ] && clear && printf "ERROR: No internet connection - Missing dependencies cannot be installed. Please try again\n\n" && exit 126 # Test internet
         printf "Installing missing dependencies from Github (mbc)..."
         mkdir /media/fat/Scripts/.mister_batch_control
         wget -qP /media/fat/Scripts/.mister_batch_control "https://github.com/pocomane/MiSTer_Batch_Control/releases/download/untagged-533dda82c9fd24faa6f1/mbc"
@@ -196,12 +196,6 @@ rescanRoms () {
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
         clear
-        echo
-        echo -e "previous_games_folder_size: $previous_games_folder_size"
-        echo
-        echo
-        echo -e "current_games_folder_size: $current_games_folder_size"
-        echo
         printf "** FILE CHANGE DETECTED - Please be patient while $console ROMS are re-scanned **"
         sleep 2
         scanRoms
