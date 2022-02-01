@@ -62,13 +62,13 @@ getFolderSize () { # Find total disk space used by console-specific ROMS only (u
     elif [ $console == "Genesis" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.bin *.gen *.md **/*.bin **/*.gen **/*.md 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "GBA" ]; then
-        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gba **/*.gba 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gba **/*.gba 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "GAMEBOY" ]; then
-        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gb *.gbc **/*.gb **/*.gbc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gb *.gbc **/*.gb **/*.gbc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "SMS" ]; then
-        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "TGFX16" ]; then
-        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`" 
+        games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     fi
 
     echo $games_folder_size > "games_folder_size_$console.txt"
@@ -182,13 +182,13 @@ rescanRoms () {
     elif [ $console == "Genesis" ]; then
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.bin *.gen *.md **/*.bin **/*.gen **/*.md 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "GBA" ]; then
-        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gba **/*.gba 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"        
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gba **/*.gba 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "GAMEBOY" ]; then
-        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gb **/*.gbc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"        
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.gb *.gbc **/*.gb **/*.gbc 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "SMS" ]; then
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
-    elif [ $console == "SMS" ]; then
-        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"        
+    elif [ $console == "TGFX16" ]; then
+        current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     fi
 
     previous_games_folder_size="`cat games_folder_size_$console.txt`"
@@ -196,6 +196,12 @@ rescanRoms () {
     if [ "$current_games_folder_size" -ne "$previous_games_folder_size" ]
     then
         clear
+        echo
+        echo -e "previous_games_folder_size: $previous_games_folder_size"
+        echo
+        echo
+        echo -e "current_games_folder_size: $current_games_folder_size"
+        echo
         printf "** FILE CHANGE DETECTED - Please be patient while $console ROMS are re-scanned **"
         sleep 2
         scanRoms
@@ -276,9 +282,6 @@ exit
 
 TO-DO
 
-- Add supported consoles
-NeoGeo
-
 - Add "ALL" option
 
 - Script that curls actual script
@@ -295,3 +298,11 @@ README
 - You must be connected to the internet the first time you run this script to download a dependency
 - If you wish to run it offline after that, download the script from here and place it in your /media/fat/Scripts folder. But please note, you will not get the latest script updates this way.
 - Be sure to set fat or usb0 in the user options before you use the script! The default is microsd (fat) but some people use usb0
+
+1983 NES
+1986 SMS
+1987 TGFX16
+1988 Genesis
+1989 GAMEBOY
+1990 SNES
+2001 GBA
