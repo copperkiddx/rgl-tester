@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Random Console Game Launcher v1.0
+# Random Game Launcher
 # by copperkiddx <copperkiddx@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -81,6 +81,8 @@ getFolderSize () { # Find total disk space used by console-specific ROMS only (u
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "TGFX16" ]; then
         games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    elif [ $console == "ARCADE" ]; then
+        games_folder_size="`cd /media/fat/_Arcade; du -c --max-depth=1 -- *.mra 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     fi
 
     echo $games_folder_size > "games_folder_size_$console.txt"
@@ -106,6 +108,7 @@ launchMenu () {
             "5" "GAMEBOY" \
             "6" "Master System" \
             "7" "TurboGrafx-16" \
+            "8" "Arcade" \
              2>&1 1>&3)
         exit_status=$?
         exec 3>&-
@@ -154,6 +157,10 @@ launchMenu () {
                 console="TGFX16"
                 break
                 ;;
+            8 )
+                console="ARCADE"
+                break
+                ;;                
         esac
     done
 }
@@ -201,6 +208,8 @@ rescanRoms () {
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.sms **/*.sms 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     elif [ $console == "TGFX16" ]; then
         current_games_folder_size="`cd /media/fat/games/$console; du -c --max-depth=999 -- *.pce **/*.pce 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
+    elif [ $console == "ARCADE" ]; then
+        current_games_folder_size="`cd /media/fat/_Arcade; du -c --max-depth=1 -- *.mra 2>/dev/null | awk '$2 == "total" {total += $1} END {print total}'`"
     fi
 
     previous_games_folder_size="`cat games_folder_size_$console.txt`"
@@ -231,6 +240,8 @@ scanRoms () {
             find "$core_games_folder" -iregex '.*\.\(sms\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
         elif [ $console == "TGFX16" ]; then
             find "$core_games_folder" -iregex '.*\.\(pce\)$' ! -name '*[Rr][Ee][Aa][Dd][Mm][Ee]*' -exec ls > "rom_paths_$console.txt" {} \;
+        elif [ $console == "ARCADE" ]; then
+            find "$arcade_games_folder" -maxdepth 1 -name '*.[Mm][Rr][Aa]' -exec ls > "rom_paths_$console.txt" {} \;
         fi
 
     # if rom_paths_$console.txt is empty, no ROMS were found, so exit
@@ -261,8 +272,9 @@ checkDependencies
 # Launch menu
 launchMenu
 
-# Set console game folder path variable
+# Set game folders path variables
 core_games_folder="/media/$fat_or_usb0/games/$console"
+arcade_games_folder="/media/$fat_or_usb0/_Arcade"
 
 # If the console has already been scanned, check for new roms, then load game, Otherwise, run an initial scan and then load a random game
 if [[ -f "scanned_$console" ]]
