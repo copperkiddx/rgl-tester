@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Random Game Launcher v1.0
+# Random Console Game Launcher v1.0
 # by copperkiddx <copperkiddx@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,18 @@ fat_or_usb0="fat" # Location of your ROMS: Use "fat" for microSD or "usb0" for h
 hide_rom_name_on_launch="0" # Use "0" to display the game name upon launch OR "1" to display "???" instead of the game name
 
 #=========   END USER OPTIONS   =========
+
+# ini settings
+ORIGINAL_SCRIPT_PATH="$0"
+if [ "$ORIGINAL_SCRIPT_PATH" == "bash" ]
+then
+	ORIGINAL_SCRIPT_PATH=$(ps | grep "^ *$PPID " | grep -o "[^ ]*$")
+fi
+INI_PATH=${ORIGINAL_SCRIPT_PATH%.*}.ini
+if [ -f $INI_PATH ]
+then
+	eval "$(cat $INI_PATH | tr -d '\r')"
+fi
 
 #=========   FUNCTIONS   =========
 
@@ -83,7 +95,7 @@ launchMenu () {
     while true; do
         exec 3>&1
         selection=$(dialog \
-            --backtitle "Random Game Launcher" \
+            --backtitle "Random Console Game Launcher" \
             --clear \
             --cancel-label "Exit" \
             --menu "Select a console:" $HEIGHT $WIDTH 4 \
